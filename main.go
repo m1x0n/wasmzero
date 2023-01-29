@@ -6,6 +6,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"image/gif"
+	_ "image/png"
 	"log"
 )
 
@@ -20,6 +21,7 @@ const (
 
 type WasmZero struct {
 	Images []*ebiten.Image
+	Arena  *ebiten.Image
 	Count  int
 }
 
@@ -45,6 +47,12 @@ func NewWasmZero() *WasmZero {
 		wz.Images = append(wz.Images, img)
 	}
 
+	arena, _, err := ebitenutil.NewImageFromFileSystem(imageFiles, "img/arena.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+	wz.Arena = arena
+
 	return wz
 }
 
@@ -56,12 +64,16 @@ func (wz *WasmZero) Update() error {
 func (wz *WasmZero) Draw(screen *ebiten.Image) {
 	ebitenutil.DebugPrint(screen, "WasmZero")
 
+	arenaOp := &ebiten.DrawImageOptions{}
+
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(-float64(frameWidth)/2-64, -float64(frameHeight)/2)
+	op.GeoM.Translate(-float64(frameWidth)/2-32, -float64(frameHeight)/2+32)
 	op.GeoM.Translate(screenWidth/2, screenHeight/2)
 	i := (wz.Count / 8) % frameCount
 
 	offsetX := 0
+
+	screen.DrawImage(wz.Arena, arenaOp)
 
 	if i >= 3 {
 		offsetX = i*32 + 16
@@ -82,6 +94,7 @@ func (wz *WasmZero) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 //go:embed img/*.gif
+//go:embed img/*.png
 var imageFiles embed.FS
 
 func main() {
