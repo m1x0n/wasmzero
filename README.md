@@ -1,7 +1,7 @@
 wasmzero
 ====
 
-Subzero character animation in wasm.
+Subzero character animation in wasm with the help of Golang.
 
 Game engine:
 [Ebitengine](https://ebitengine.org/)
