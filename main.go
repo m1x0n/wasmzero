@@ -57,10 +57,24 @@ func (wz *WasmZero) Draw(screen *ebiten.Image) {
 	ebitenutil.DebugPrint(screen, "WasmZero")
 
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(-float64(frameWidth)/2, -float64(frameHeight)/2)
+	op.GeoM.Translate(-float64(frameWidth)/2-64, -float64(frameHeight)/2)
 	op.GeoM.Translate(screenWidth/2, screenHeight/2)
 	i := (wz.Count / 8) % frameCount
-	screen.DrawImage(wz.Images[i], op)
+
+	offsetX := 0
+
+	if i >= 3 {
+		offsetX = i*32 + 16
+		// Render knees posture
+		op.GeoM.Translate(0, 0)
+		screen.DrawImage(wz.Images[2], op)
+
+		op.GeoM.Translate(float64(offsetX), 0)
+		screen.DrawImage(wz.Images[i], op)
+	} else {
+		op.GeoM.Translate(float64(offsetX), 0)
+		screen.DrawImage(wz.Images[i], op)
+	}
 }
 
 func (wz *WasmZero) Layout(outsideWidth, outsideHeight int) (int, int) {
